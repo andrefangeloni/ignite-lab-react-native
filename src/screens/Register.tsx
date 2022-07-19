@@ -1,8 +1,8 @@
 import { VStack } from 'native-base';
-import { Button } from '../components/Button';
 
-import { Header } from '../components/Header';
 import { Input } from '../components/Input';
+import { Button } from '../components/Button';
+import { Header } from '../components/Header';
 
 export const Register = () => {
   return (

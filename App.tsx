@@ -8,7 +8,7 @@ import {
 
 import { Loading } from './src/components/Loading';
 
-import { Register } from './src/screens/Register';
+import { Routes } from './src/routes';
 
 import { THEME } from './src/styles/theme';
 
@@ -26,7 +26,7 @@ export const App = () => {
         backgroundColor="transparent"
       />
 
-      {fontsLoaded ? <Register /> : <Loading />}
+      {fontsLoaded ? <Routes /> : <Loading />}
     </NativeBaseProvider>
   );
 };
