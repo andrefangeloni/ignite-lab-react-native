@@ -1,5 +1,7 @@
 import React from 'react';
+import { useNavigation } from '@react-navigation/native';
 import { SignOut, ChatTeardropText } from 'phosphor-react-native';
+
 import {
   Text,
   Center,
@@ -19,8 +21,16 @@ import { Order, OrderProps } from '../components/Order';
 
 export const Home = () => {
   const { colors } = useTheme();
+  const navigation = useNavigation();
 
-  const [orders, setOrders] = React.useState<OrderProps[]>([]);
+  const [orders, setOrders] = React.useState<OrderProps[]>([
+    {
+      id: '123',
+      patrimony: '123456',
+      when: '19/07/2022 às 18:00h',
+      status: 'open',
+    },
+  ]);
   const [statusSelected, setStatusSelected] = React.useState<'open' | 'closed'>(
     'open',
   );
@@ -49,9 +59,9 @@ export const Home = () => {
           justifyContent="space-between"
           alignItems="center"
         >
-          <Heading color="gray.100">Meus chamados</Heading>
+          <Heading color="gray.100">Solicitações</Heading>
 
-          <Text color="gray.200">3</Text>
+          <Text color="gray.200">{orders.length}</Text>
         </HStack>
 
         <HStack space={3} mb={8}>
@@ -73,7 +83,14 @@ export const Home = () => {
         <FlatList
           data={orders}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <Order data={item} />}
+          renderItem={({ item }) => (
+            <Order
+              data={item}
+              onPress={() =>
+                navigation.navigate('Details', { orderId: item.id })
+              }
+            />
+          )}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 10 }}
           ListEmptyComponent={() => (
@@ -88,7 +105,10 @@ export const Home = () => {
           )}
         />
 
-        <Button title="Nova solicitação" />
+        <Button
+          title="Nova solicitação"
+          onPress={() => navigation.navigate('Register')}
+        />
       </VStack>
     </VStack>
   );

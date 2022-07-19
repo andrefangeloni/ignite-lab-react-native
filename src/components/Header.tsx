@@ -6,6 +6,7 @@ import {
   StyledProps,
 } from 'native-base';
 import { CaretLeft } from 'phosphor-react-native';
+import { useNavigation } from '@react-navigation/native';
 
 type Props = StyledProps & {
   title: string;
@@ -13,6 +14,7 @@ type Props = StyledProps & {
 
 export const Header = ({ title, ...rest }: Props) => {
   const { colors } = useTheme();
+  const navigation = useNavigation();
 
   return (
     <HStack
@@ -24,17 +26,21 @@ export const Header = ({ title, ...rest }: Props) => {
       pt={4}
       {...rest}
     >
-      <IconButton icon={<CaretLeft size={24} color={colors.gray[200]} />} />
-
       <Heading
         color="gray.100"
         textAlign="center"
         fontSize="lg"
         flex={1}
-        ml={-6}
+        mt={2}
       >
-       {title} 
+        {title}
       </Heading>
+
+      <IconButton
+        position="absolute"
+        onPress={() => navigation.goBack()}
+        icon={<CaretLeft size={24} color={colors.gray[200]} />}
+      />
     </HStack>
   );
 };
