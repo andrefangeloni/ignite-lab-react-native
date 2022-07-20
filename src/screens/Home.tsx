@@ -1,6 +1,7 @@
 import React from 'react';
 import { Alert } from 'react-native';
 import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { SignOut, ChatTeardropText } from 'phosphor-react-native';
 
@@ -19,20 +20,17 @@ import Logo from '../assets/logo_secondary.svg';
 
 import { Button } from '../components/Button';
 import { Filter } from '../components/Filter';
+import { Loading } from '../components/Loading';
 import { Order, OrderProps } from '../components/Order';
+
+import { firestoreDateFormat } from '../utils/firestoreDateFormat';
 
 export const Home = () => {
   const { colors } = useTheme();
   const navigation = useNavigation();
 
-  const [orders, setOrders] = React.useState<OrderProps[]>([
-    {
-      id: '123',
-      patrimony: '123456',
-      when: '19/07/2022 às 18:00h',
-      status: 'open',
-    },
-  ]);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [orders, setOrders] = React.useState<OrderProps[]>([]);
   const [statusSelected, setStatusSelected] = React.useState<'open' | 'closed'>(
     'open',
   );
@@ -44,6 +42,32 @@ export const Home = () => {
       Alert.alert('Erro inesperado', 'Tente novamente mais tarde');
     }
   };
+
+  React.useEffect(() => {
+    setIsLoading(true);
+
+    const subscriber = firestore()
+      .collection('orders')
+      .where('status', '==', statusSelected)
+      .onSnapshot((snapshot) => {
+        const data = snapshot.docs.map((doc) => {
+          const { patrimony, description, status, created_at } = doc.data();
+
+          return {
+            id: doc.id,
+            patrimony,
+            description,
+            status,
+            when: firestoreDateFormat(created_at),
+          };
+        });
+
+        setOrders(data);
+        setIsLoading(false);
+      });
+
+    return subscriber;
+  }, [statusSelected]);
 
   return (
     <VStack flex={1} pb={6} bg="gray.700">
@@ -93,30 +117,34 @@ export const Home = () => {
           />
         </HStack>
 
-        <FlatList
-          data={orders}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <Order
-              data={item}
-              onPress={() =>
-                navigation.navigate('Details', { orderId: item.id })
-              }
-            />
-          )}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 10 }}
-          ListEmptyComponent={() => (
-            <Center>
-              <ChatTeardropText color={colors.gray[300]} size={40} />
-              <Text color="gray.300" fontSize="xl" mt={6} textAlign="center">
-                Você ainda não possui {'\n'}
-                solicitações{' '}
-                {statusSelected === 'open' ? 'em andamento' : 'finalizadas'}
-              </Text>
-            </Center>
-          )}
-        />
+        {isLoading ? (
+          <Loading />
+        ) : (
+          <FlatList
+            data={orders}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <Order
+                data={item}
+                onPress={() =>
+                  navigation.navigate('Details', { orderId: item.id })
+                }
+              />
+            )}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 10 }}
+            ListEmptyComponent={() => (
+              <Center>
+                <ChatTeardropText color={colors.gray[300]} size={40} />
+                <Text color="gray.300" fontSize="xl" mt={6} textAlign="center">
+                  Você ainda não possui {'\n'}
+                  solicitações{' '}
+                  {statusSelected === 'open' ? 'em andamento' : 'finalizadas'}
+                </Text>
+              </Center>
+            )}
+          />
+        )}
 
         <Button
           title="Nova solicitação"
