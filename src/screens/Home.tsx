@@ -1,4 +1,6 @@
 import React from 'react';
+import { Alert } from 'react-native';
+import auth from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import { SignOut, ChatTeardropText } from 'phosphor-react-native';
 
@@ -35,6 +37,14 @@ export const Home = () => {
     'open',
   );
 
+  const handleLogout = async () => {
+    try {
+      await auth().signOut();
+    } catch (e: any) {
+      Alert.alert('Erro inesperado', 'Tente novamente mais tarde');
+    }
+  };
+
   return (
     <VStack flex={1} pb={6} bg="gray.700">
       <HStack
@@ -48,7 +58,10 @@ export const Home = () => {
       >
         <Logo />
 
-        <IconButton icon={<SignOut size={26} color={colors.gray[300]} />} />
+        <IconButton
+          onPress={() => handleLogout()}
+          icon={<SignOut size={26} color={colors.gray[300]} />}
+        />
       </HStack>
 
       <VStack flex={1} px={6}>
