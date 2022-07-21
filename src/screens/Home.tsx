@@ -121,6 +121,7 @@ export const Home = () => {
           <Loading />
         ) : (
           <FlatList
+            mb={4}
             data={orders}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
@@ -132,7 +133,6 @@ export const Home = () => {
               />
             )}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 10 }}
             ListEmptyComponent={() => (
               <Center>
                 <ChatTeardropText color={colors.gray[300]} size={40} />
